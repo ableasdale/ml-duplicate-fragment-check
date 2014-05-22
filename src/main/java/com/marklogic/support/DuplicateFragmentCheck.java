@@ -16,7 +16,7 @@ import java.util.*;
  */
 public class DuplicateFragmentCheck {
 
-    private static final String DATABASE_NAME = "YourDBNameHere";
+    private static final String DATABASE_NAME = "cengage";
     private static final String CONNECTION_URI = "xcc://q:q@192.168.1.104:9999/"+DATABASE_NAME;
 
     private static final Logger LOG = LoggerFactory
@@ -33,7 +33,7 @@ public class DuplicateFragmentCheck {
         Request r = s.newAdhocQuery("declare variable $db as xs:string external;\nxdmp:database-forests(xdmp:database($db))");
         r.setNewStringVariable("db", DATABASE_NAME);
         ResultSequence rs = s.submitRequest (r);
-        LOG.info("The database '" + DATABASE_NAME + "' contains " +  rs.size() + " forests.");
+        LOG.info(String.format("The database '%s' contains %d forests.", DATABASE_NAME, rs.size()));
         s.close();
 
         // arraylist to place all forest URI lists in case the information is needed later
@@ -46,7 +46,7 @@ public class DuplicateFragmentCheck {
         for (int i = 1; i <= rs.size(); i++){
             ResultItem ri = rs.resultItemAt(i - 1);
             String forestId = ri.getItem().toString();
-            LOG.info("Getting list of URIs for forest ( "+i+" of "+rs.size()+" ): " + forestId);
+            LOG.info(String.format("Getting full list of URIs for forest ( %d of %d ): %s", i, rs.size(), forestId));
             List<String> items = new ArrayList<String>();
             Session s2 = cs.newSession();
 
@@ -57,20 +57,17 @@ public class DuplicateFragmentCheck {
                 String currentItem = ri2.getItem().toString();
                 items.add(currentItem);
                 if (set.contains(currentItem)){
-                    LOG.info("Duplicate URI detected: " + currentItem + " in forest: " + forestId);
+                    LOG.info(String.format("Duplicate URI detected: %s in forest: %s", currentItem, forestId));
                     dupes.add(currentItem);
                 } else {
                     set.add(currentItem);
                 }
             }
             uriMap.put(ri.getItem().toString(), items);
-            LOG.info(items.size() + " URIs found in forest: " + forestId + " at " + new Date());
+            LOG.info(String.format("%d URIs found in forest: %s at %s", items.size(), forestId, new Date()));
             s2.close();
         }
-        LOG.info("URI / Forest mapping complete for all forests: " + set.size() + " unique URIs " + dupes.size() + " duplicate URIs found");
-
-
-        LOG.info("DEBUG POINT");
+        LOG.info(String.format("URI / Forest mapping complete for all forests: %d unique URIs %d duplicate URIs found", set.size(), dupes.size()));
 
     }
 }
