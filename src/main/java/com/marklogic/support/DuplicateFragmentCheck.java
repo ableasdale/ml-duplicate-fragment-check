@@ -19,8 +19,12 @@ import java.util.*;
  */
 public class DuplicateFragmentCheck {
 
+    private static final String USER = "q";
+    private static final String PASSWORD = "q";
+    private static final String HOST = "192.168.1.104";
+    private static final String PORT = "9999";
     private static final String DATABASE_NAME = "mydb";
-    private static final String CONNECTION_URI = "xcc://q:q@192.168.1.104:9999/"+DATABASE_NAME;
+    private static final String CONNECTION_URI = String.format("xcc://%s:%s@%s:%s/%s", USER, PASSWORD, HOST, PORT, DATABASE_NAME);
     public static final String CSV_FILENAME = "e:\\duplicate-report.csv";
 
     private static final Logger LOG = LoggerFactory
@@ -60,7 +64,7 @@ public class DuplicateFragmentCheck {
             ResultSequence rs2 = s2.submitRequest (r2);
             LOG.info("Complete URI list obtained from the server at: "+ new Date());
             s2.close();
-            LOG.info("Running duplicate URI check...");
+            LOG.debug("Processing forest URIs ...");
             for (ResultItem ri2 : rs2.toResultItemArray()){
                 String currentItem = ri2.getItem().toString();
                 items.add(currentItem);
@@ -80,16 +84,14 @@ public class DuplicateFragmentCheck {
         for (String item : dupes){
             sb.append(item).append(",");
             for (String forest : masterUriSets.keySet()) {
-                //LOG.info(forest + " | "+ item);
                 Set x = masterUriSets.get(forest);
                 if (x.contains(item)){
                     sb.append(forest).append(",");
                 }
             }
             sb.append("\n");
-            //LOG.info(String.format("Adding: %s", item));
         }
-        // create file
+        // write out CSV file
         File file = new File(CSV_FILENAME);
         BufferedWriter writer = new BufferedWriter(new FileWriter(file));
         try {
@@ -98,6 +100,5 @@ public class DuplicateFragmentCheck {
             if (writer != null) writer.close();
         }
         LOG.info(String.format("Full CSV report completed - file saved as %s", CSV_FILENAME));
-
     }
 }
