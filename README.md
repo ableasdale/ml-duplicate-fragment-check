@@ -11,12 +11,17 @@ Tool for identifying duplicate URIs in multiple forests in a given MarkLogic Dat
 
 Set up the application by configuring the following values in DuplicateFragmentCheck.java:
 
+#### XCC Connection URI ####
+
     private static final String USER = "q";
     private static final String PASSWORD = "q";
     private static final String HOST = "192.168.1.104";
     private static final String PORT = "9999";
     private static final String DATABASE_NAME = "mydb";
-    private static final String CONNECTION_URI = String.format("xcc://%s:%
+
+#### CSV Output File ####
+
+	public static final String CSV_FILENAME = "e:\\duplicate-report.csv";
 
 ###Console Output###
 
